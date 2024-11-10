@@ -5,10 +5,4 @@ def main():
 if __name__ == "__main__":
     main()
 print("Ray")
-print("Ray")
-print("Ray")
-print("Ray")
-print("Ray")
-print("Ray")
-print("Ray")
-print("Ray")
+# Test commit from a submodule
