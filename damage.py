@@ -33,7 +33,11 @@ class Damage:
 
     def __str__(self):
         '''str'''
-        return f"Element : {self.element}\nMultiplyer : {self.mult}%\nType : {[dtype for dtype in self.type if self.type[dtype]]}"
+        return (
+            f"Element : {self.element}\n"
+            f"Multiplyer : {self.mult}%\n"
+            f"Type : {[dtype for dtype in self.type.values() if dtype]}"
+        )
 
 def __test():
     '''Driver Code'''
