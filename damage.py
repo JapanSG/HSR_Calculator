@@ -7,7 +7,9 @@ class Damage:
     def __init__(
         self,
         element : str,
-        mult : int,
+        base : float,
+        mult : float,
+        hits : tuple, #ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
         basic: bool = False,
         skill: bool = False,
         ult: bool = False,
@@ -29,14 +31,16 @@ class Damage:
         if element not in ELEMENTS:
             raise ex.NoSuchElement(element)
         self.element = element
+        self.base = base
         self.mult = mult
+        self.hits = hits
 
     def __str__(self):
         '''str'''
         return (
             f"Element : {self.element}\n"
             f"Multiplyer : {self.mult}%\n"
-            f"Type : {[dtype for dtype in self.type.values() if dtype]}"
+            f"Type : {[dtype[0] for dtype in self.type.items() if dtype[1]]}"
         )
 
 def __test():
