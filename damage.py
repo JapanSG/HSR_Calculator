@@ -18,6 +18,8 @@ class Damage:
         breaks : bool = False,
         additional : bool = False
     ):
+        
+
         '''Constructor'''
         self.type = {
             "basic" : basic,
