@@ -4,32 +4,19 @@ ELEMENTS = ["fire", "ice", "physical", "lightning", "wind", "quantum", "imaginar
 class Damage:
     '''Damage class'''
 
-    def __init__(
-        self,
-        element : str,
-        base : float,
-        mult : float,
-        hits : tuple, #ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
-        basic: bool = False,
-        skill: bool = False,
-        ult: bool = False,
-        fua: bool = False,
-        dot: bool = False,
-        breaks : bool = False,
-        additional : bool = False
-    ):
-        
-
+    def __init__(self,element : str, base : float, mult : float, hits : tuple, **kwargs):
+        #ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
         '''Constructor'''
         self.type = {
-            "basic" : basic,
-            "skill" : skill,
-            "ult" : ult,
-            "fua" : fua,
-            "dot" : dot,
-            "break" : breaks,
-            "additional" : additional
+            "basic" : kwargs.get('basic', False),
+            "skill" : kwargs.get('skill',False),
+            "ult" : kwargs.get('ult',False),
+            "fua" : kwargs.get('fua',False),
+            "dot" : kwargs.get('dot',False),
+            "break" : kwargs.get('break',False),
+            "additional" : kwargs.get('additional',False)
         }
+        
         if element not in ELEMENTS:
             raise ex.NoSuchElement(element)
         self.element = element
@@ -44,7 +31,9 @@ class Damage:
             f"Multiplyer : {self.mult}%\n"
             f"Type : {[dtype[0] for dtype in self.type.items() if dtype[1]]}"
         )
-
+    def dmg_formula(self):
+        base_dmg = self.mult * self.base 
+        
 def __test():
     '''Driver Code'''
     a = Damage('fire', 40, basic = True)
