@@ -3,10 +3,12 @@ from character import Character
 
 class Enemy(Character):
     '''Enemy Class'''
-    def __init__(self, name: str, base_stats : tuple, **kwargs) -> None:
+    def __init__(self, level:int, name: str, base_stats : tuple, **kwargs) -> None:
         '''Constructor'''
-        super().__init__(name, base_stats, **kwargs)
+        super().__init__(name, level, base_stats, **kwargs)
         self.crit_rate = 0
+        self.toughness = kwargs.get('toughness', 30)
+        self.curr_toughness = self.toughness
 
     def __str__(self):
         '''String'''
