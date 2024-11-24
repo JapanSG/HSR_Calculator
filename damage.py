@@ -7,7 +7,7 @@ ELEMENTS = ["fire", "ice", "physical", "lightning", "wind", "quantum", "imaginar
 class Damage:
     '''Damage class'''
 
-    def __init__(self, element : str, mult : float, hits : tuple, **kwargs):
+    def __init__(self, element : str, mult : float, hits : list, **kwargs):
         #ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
         '''Constructor'''
         self.type = {
@@ -53,7 +53,7 @@ class Damage:
         # iterate through each hit in dmg_per hit and calculate if a hit is a critical or not 
         for i in range(len(dmg_per_hit)):
             if random.random() <= char.crit_rate:
-                dmg_per_hit[i] *= char.crit_dmg
+                dmg_per_hit[i] *= 1 + char.crit_dmg
 
         # return all hits seperately in a list
         return dmg_per_hit
