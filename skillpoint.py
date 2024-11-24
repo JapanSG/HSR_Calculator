@@ -22,10 +22,7 @@ class SkillPoint:
 
     def use(self, num : int) -> None:
         '''manager skill point recovery and usage'''
+        # min function is to make sure self.curr is not more than self.max
+        # and max function is for self.curr not to be below 0.
         updated = self.curr + num
-        if updated < 0:
-            self.curr = 0
-        elif updated > self.max:
-            self.curr = self.max
-        else:
-            self.curr = updated
+        self.curr = max(min(updated,self.max),0)
