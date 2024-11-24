@@ -7,14 +7,16 @@ import setting
 
 class Ally(Character):
     '''Ally Class'''
-    def __init__(self, name: str, base_stats: tuple, **kwargs) -> None:
+    def __init__(self, name: str, level: int, base_stats: tuple, **kwargs) -> None:
         '''Constructor
             hidden_stats =  (
+                            res_pen : float
                             break_efficiency: float,
                             taunt: float
                             )
         '''
-        super().__init__(name, base_stats, **kwargs)
+        super().__init__(name, level, base_stats, **kwargs)
+        self.res_pen = kwargs.get('res_pen', 0.0)
         self.break_efficiency = kwargs.get('break_efficiency', 0.0)
         self.taunt = kwargs.get('taunt', 0.0)
 
@@ -36,17 +38,6 @@ class DestructionTrailblazer(Ally):
     def basic(self, target: e.Enemy) -> None:
         '''basic attack'''
         setting.SP.use(1)
-        base_dmg = self.atk
-        dmg_boost_mult = 1 + self.physical_dmg
-        def_mult = 1 - (target.defe/(target.defe+200+10*80))
-        res_mult = 1 - (target.physical_res)
-        dmg_taken_mult = 1
-        universal_mult = 1*(0.9)
-        crit_mult = 1
-        if random.random() <= self.crit_rate:
-            crit_mult += self.crit_dmg
-        dmg = base_dmg*def_mult*dmg_boost_mult*res_mult*dmg_taken_mult*universal_mult*crit_mult
-        target.hp -= dmg
 
     def skill(self, target: e.Enemy) -> None:
         '''skill'''
@@ -58,4 +49,4 @@ class DestructionTrailblazer(Ally):
 
 if __name__ == "__main__":
     mc = DestructionTrailblazer(taunt = 125.0)
-    print(mc)
+    print(mc.dmg_boost['physical'])
