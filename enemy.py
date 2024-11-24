@@ -3,7 +3,7 @@ from character import Character
 
 class Enemy(Character):
     '''Enemy Class'''
-    def __init__(self, level:int, name: str, base_stats : tuple, **kwargs) -> None:
+    def __init__(self, name: str, level:int, base_stats : tuple, **kwargs) -> None:
         '''Constructor'''
         super().__init__(name, level, base_stats, **kwargs)
         self.crit_rate = 0
