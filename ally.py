@@ -1,39 +1,9 @@
 '''ally'''
-from character import Character
+from character import Ally
 import enemy as e
 import random
 import damage
 import skillpoint
-
-class Ally(Character):
-    '''Ally Class'''
-    def __init__(self, name: str, level: int, base_stats: tuple, **kwargs) -> None:
-        '''Constructor
-            hidden_stats =  (
-                            res_pen : float
-                            break_efficiency: float,
-                            taunt: float
-                            )
-        '''
-        super().__init__(name, level, base_stats, **kwargs)
-        self.curr_energy = self.max_energy/2
-        self.res_pen = kwargs.get('res_pen', 0.0)
-        self.break_efficiency = kwargs.get('break_efficiency', 0.0)
-        self.taunt = kwargs.get('taunt', 0.0)
-
-    def __str__(self) -> str:
-        '''String'''
-        return super().__str__()
-    
-    def gain_energy(self, num : float) -> None:
-        '''Method to gaining energy'''
-        # min function is to make sure curr_energy is not more than max_energy
-        # and max function is for curr_energy to not be below 0.
-        self.curr_energy = max(min(self.curr_energy + num*(1 + self.energy_regen_rate), self.max_energy),0)
-
-    def use_energy(self, num : float) -> None:
-        '''Method for using energy'''
-        self.curr_energy -= num
 
 class DestructionTrailblazer(Ally):
     '''DestructionTrailblazer'''

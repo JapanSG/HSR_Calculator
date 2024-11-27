@@ -96,5 +96,48 @@ class Character:
         '''repr'''
         return self.__str__()
 
+class Ally(Character):
+    '''Ally Class'''
+    def __init__(self, name: str, level: int, base_stats: tuple, **kwargs) -> None:
+        '''Constructor
+            hidden_stats =  (
+                            res_pen : float
+                            break_efficiency: float,
+                            taunt: float
+                            )
+        '''
+        super().__init__(name, level, base_stats, **kwargs)
+        self.curr_energy = self.max_energy/2
+        self.res_pen = kwargs.get('res_pen', 0.0)
+        self.break_efficiency = kwargs.get('break_efficiency', 0.0)
+        self.taunt = kwargs.get('taunt', 0.0)
+
+    def __str__(self) -> str:
+        '''String'''
+        return super().__str__()
+    
+    def gain_energy(self, num : float) -> None:
+        '''Method to gaining energy'''
+        # min function is to make sure curr_energy is not more than max_energy
+        # and max function is for curr_energy to not be below 0.
+        self.curr_energy = max(min(self.curr_energy + num*(1 + self.energy_regen_rate), self.max_energy),0)
+
+    def use_energy(self, num : float) -> None:
+        '''Method for using energy'''
+        self.curr_energy -= num
+
+class Enemy(Character):
+    '''Enemy Class'''
+    def __init__(self, name: str, level:int, base_stats : tuple, **kwargs) -> None:
+        '''Constructor'''
+        super().__init__(name, level, base_stats, **kwargs)
+        self.crit_rate = 0
+        self.toughness = kwargs.get('toughness', 30)
+        self.curr_toughness = self.toughness
+
+    def __str__(self):
+        '''String'''
+        return super().__str__()
+
 if __name__ == "__main__":
     pass
