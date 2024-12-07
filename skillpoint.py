@@ -14,7 +14,7 @@ class SkillPoint:
     
     def __str__(self) -> str:
         '''str'''
-        return f"{self.curr}"
+        return f"{self.curr}/{self.max}"
 
     def __repr__(self) -> int:
         '''repr'''

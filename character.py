@@ -1,7 +1,8 @@
-'''character'''
+'''character_base_class'''
+import event
 class Character:
     '''Character class'''
-    def __init__(self, name :str, level:int, base_stats : tuple, **kwargs) -> None:
+    def __init__(self, name :str, level:int, base_stats : tuple, observer : event.EventManager, **kwargs) -> None:
         '''
         Constructor
         name = character name : str
@@ -52,19 +53,51 @@ class Character:
                             taunt: float
                             )
         '''
+
+        self.stats = {
+            "hp"                : base_stats[0],
+            "hp_per"            : kwargs.get('hp_per', 0.0),
+            "hp_flat"           : kwargs.get('hp_flat', 0.0),
+
+            "atk"               : base_stats[1],
+            "atk_per"           : kwargs.get("atk_per", 0.0),
+            "atk_flat"          : kwargs.get("atk_flat", 0.0),
+
+            "defe"              : base_stats[2],
+            "def_per"           : kwargs.get("def_per", 0.0),
+            "def_flat"          : kwargs.get("def_flat", 0.0),
+
+            "spd"               : base_stats[3],
+            "spd_per"           : kwargs.get("spd_per", 0.0),
+            "spd_flat"          : kwargs.get("spd_flat", 0.0),
+
+            "crit_rate"         : kwargs.get('crit_rate', 0.05),
+            "crit_dmg"          : kwargs.get('crit_dmg', 0.50),
+            "break_effect"      : kwargs.get('break_effect', 0.0),
+            "outgoing_healing"  : kwargs.get('outgoing_healing', 0.0),
+            "max_energy"        : kwargs.get('max_energy', 0.0),
+            "energy_regen_rate" : kwargs.get('energy_regen_rate', 0.0),
+            "effect_hit_rate"   : kwargs.get('effect_hit_rate', 0.0),
+            "effect_res"        : kwargs.get('effect_res', 0.0),
+
+            "def_reduction"     : kwargs.get('def_reduction', 0.0),
+            "def_ignore"        : kwargs.get('def_ignore', 0.0)
+        }
+
         self.name = name
         self.level = level
-        self.hp, self.atk, self.defe, self.spd = base_stats
-        self.curr_hp = self.hp
 
-        self.crit_rate = kwargs.get('crit_rate', 0.05)
-        self.crit_dmg = kwargs.get('crit_dmg', 0.50)
-        self.break_effect = kwargs.get('break_effect', 0.0)
-        self.outgoing_healing = kwargs.get('outgoing_healing', 0.0)
-        self.max_energy = kwargs.get('max_energy', 0.0)
-        self.energy_regen_rate = kwargs.get('energy_regen_rate', 0.0)
-        self.effect_hit_rate = kwargs.get('effect_hit_rate', 0.0)
-        self.effect_res = kwargs.get('effect_res', 0.0)
+        self.total_hp = self.stats["hp"] * (1 + self.stats["hp_per"]) + self.stats["hp_flat"]
+        self.curr_hp = self.total_hp
+
+        self.total_atk = self.stats["atk"] * (1 + self.stats["atk_per"]) + self.stats["atk_flat"]
+
+        self.total_def = self.stats["defe"] * (1 + self.stats["def_per"] - self.stats["def_ignore"]) + self.stats["def_flat"]
+
+        self.total_spd = self.stats["spd"] * (1 + self.stats["spd_per"]) + self.stats["spd_flat"]
+
+        self.dot_dmg_boost = kwargs.get('dot_dmg_boost', 0.0)
+        self.dot_dmg_taken = kwargs.get('dot_dmg_taken', 0.0)
 
         self.dmg_boost = {
             'physical' : kwargs.get('physical_dmg', 0.0),
@@ -88,6 +121,8 @@ class Character:
 
         self.vulnerable = kwargs.get('vulnerable', 0.0)
 
+        self.observer = observer
+
     def __str__(self) -> str:
         '''String'''
         return f"{self.name}"
@@ -95,49 +130,3 @@ class Character:
     def __repr__(self) -> str:
         '''repr'''
         return self.__str__()
-
-class Ally(Character):
-    '''Ally Class'''
-    def __init__(self, name: str, level: int, base_stats: tuple, **kwargs) -> None:
-        '''Constructor
-            hidden_stats =  (
-                            res_pen : float
-                            break_efficiency: float,
-                            taunt: float
-                            )
-        '''
-        super().__init__(name, level, base_stats, **kwargs)
-        self.curr_energy = self.max_energy/2
-        self.res_pen = kwargs.get('res_pen', 0.0)
-        self.break_efficiency = kwargs.get('break_efficiency', 0.0)
-        self.taunt = kwargs.get('taunt', 0.0)
-
-    def __str__(self) -> str:
-        '''String'''
-        return super().__str__()
-    
-    def gain_energy(self, num : float) -> None:
-        '''Method to gaining energy'''
-        # min function is to make sure curr_energy is not more than max_energy
-        # and max function is for curr_energy to not be below 0.
-        self.curr_energy = max(min(self.curr_energy + num*(1 + self.energy_regen_rate), self.max_energy),0)
-
-    def use_energy(self, num : float) -> None:
-        '''Method for using energy'''
-        self.curr_energy -= num
-
-class Enemy(Character):
-    '''Enemy Class'''
-    def __init__(self, name: str, level:int, base_stats : tuple, **kwargs) -> None:
-        '''Constructor'''
-        super().__init__(name, level, base_stats, **kwargs)
-        self.crit_rate = 0
-        self.toughness = kwargs.get('toughness', 30)
-        self.curr_toughness = self.toughness
-
-    def __str__(self):
-        '''String'''
-        return super().__str__()
-
-if __name__ == "__main__":
-    pass
