@@ -1,8 +1,8 @@
 '''turn_order_manager'''
-import character
+import skillpoint as sk
+import ally_enemy_base
 import ally as a
 import enemy as e
-import skillpoint as s
 import math as m
 # TODO
 # list of things to fix
@@ -15,54 +15,80 @@ class TurnManager:
     Manages characters turn order
     and action values
     '''
-    def __init__(self, *characters : character.Character) -> None:
+    def __init__(self, sp : sk.SkillPoint, *characters : ally_enemy_base.Character) -> None:
         '''
         Constructor
         self.order values = [character.Character, AG left, Current AV]
         '''
+        self.sp = sp
+        self.running = True
         self.allies = [char for char in characters if isinstance(char, a.Ally)]
         self.enemies = [char for char in characters if isinstance(char, e.Enemy)]
-        self.order = [[char, 10000, m.ceil(10000/char.spd)] for char in characters]
-        self.order.sort(key = lambda x : x[2])
+        self.order = [[char, 10000, m.ceil(10000/char.total_spd)] for char in characters] # item = [Character, AG left, current AV]
+        self.order.sort(key = lambda item : item[2])
 
     def update(self) -> None:
         '''Update turn order'''
         av_passed = self.order[0][2]
         if not av_passed:
-            self.do_action()
+            item = self.order.pop(0)
+            self.do_action(item)
+            new = [item[0], 10000, m.ceil(10000/item[0].total_spd)]
+            self.__insert(new)
             return
         for i in range(len(self.order)):
             item = self.order[i]
-            spd = item[0].spd()
-            ag = max(item[1] - spd*av_passed,0)
-            av = max(item[2]-av_passed)
+            total_spd = item[0].total_spd
+            ag = max(item[1] - total_spd*av_passed, 0)
+            av = max(item[2] - av_passed, 0)
             self.order[i] = [item[0], ag, av]
 
-    def print_order(self) ->None:
+    def print_order(self, curr_ally_name) -> None: 
         '''Print Order'''
-        lis = [[item[0].name, item[2], item[1]] for item in self.order]
-        for item in lis:
-            print(*item)
+        print(f"{curr_ally_name:<20s}| Doing action")
+        for item in self.order:
+            print(f"{item[0].name:<20s}| {item[2]} AV")
 
     def __str__(self) -> str:
         '''String'''
         lis = [[item[0].name, item[2], item[1]] for item in self.order]
         return f"{lis}"
-    def do_action(self) -> None:
+
+    def do_action(self, item) -> None:
         '''Do action when av == 0 and reset av'''
-        #FIXME
-        item = self.order.pop(0) # item = [Character, AG left, current AV]
-        # if isinstance(item[0], character.Ally):
-        #     print(*self.enemies)
-        #     print(*self.allies)
-        #     target = int(input("choose which enemy to attack"))
-        #     item[0].basic(self.enemies[target-1])
-        # else:
-        #     print("Enemy took turn")
-        # new = [item[0], 10000, 10000/item[0].spd()]
-        # self._insert(new)
-        
-    def _insert(self, item: list) -> None:
+        #TODO
+        if isinstance(item[0], ally_enemy_base.Ally):
+            self.input_action(item[0])
+        else:
+            print("Enemy took turn")
+        return print("Pass")
+    
+    def input_action(self, ally : ally_enemy_base.Ally):
+        finished = False
+        print(f"It's {ally.name} turn")
+        while not finished:
+            command = input("Please input command -> ")
+            if command == 'q':
+                print("You have quit the program")
+                self.running = False
+                finished = True
+            elif command == 'help':
+                print("List of Commands :")
+            elif command == 'order':
+                self.print_order(ally.name)
+            elif command == 'hp':
+                for enemy in self.enemies:
+                    print(enemy.curr_hp)
+            elif command == 'va':
+                print(*self.allies)
+            elif command == 've':
+                print(*self.enemies)
+            elif command == 'sp':
+                print(self.sp)
+            else:
+                finished = ally.input_action(command, self.enemies, self.sp)
+
+    def __insert(self, item: list) -> None:
         '''insert item at correct av'''
         for i in range(len(self.order)):
             if self.order[i][2] > item[2]:
@@ -70,30 +96,28 @@ class TurnManager:
                 return
         self.order.append(item)
 
-    def input_action(ally:a.Ally, string:str) ->None:
-        '''input'''
-
     # FIXME
     def remove_dead(self) -> None:
         '''remove character that have less than  0 hp'''
         dead_allies = []
         for i in range(len(self.allies)):
-            if self.allies[i].hp() <= 0:
+            if self.allies[i].curr_hp <= 0:
                 dead_allies.append(i)
         for i in dead_allies:
             self.allies.pop(i)
 
         dead_enemies = []
         for i in range(len(self.enemies)):
-            if self.enemies[i].hp() <= 0:
+            if self.enemies[i].curr_hp <= 0:
                 dead_enemies.append(i)
         for i in dead_enemies:
             self.enemies.pop(i)
 
     def loop(self) -> None:
         '''Main loop'''
-        i = 0
         while True:
+            if not self.running:
+                break
             self.remove_dead()
             if not self.enemies:
                 print("Victory")
@@ -102,22 +126,10 @@ class TurnManager:
                 print("Defeat")
                 break
             self.update()
-            self.print_order()
-            print("-"*25,i,"-"*25)
-            i += 1
         print("end")
 
 def main():
     '''Driver Code'''
-    ally1 = character.Ally("ally1",(100,1000,100))
-    ally2 = character.Ally("ally2",(100,1000,120))
-    ally3 = character.Ally("ally3",(100,1000,140))
-    enemy1 = character.Enemy("enemy1",(100,1000,150))
-    enemy2 = character.Enemy("enemy2",(100,1000,95))
-    enemy3 = character.Enemy("enemy2",(100,1000,100))
-    print(enemy1)
-    order = TurnManager(ally2,enemy1,ally1,ally3,enemy2,enemy3)
-    order.loop()
 
 if __name__ == "__main__":
     main()
