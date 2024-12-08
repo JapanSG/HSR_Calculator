@@ -1,11 +1,11 @@
 '''ally'''
 import random
+import time
 from ally_enemy_base import Ally
 import enemy as e
 import damage
 import skillpoint
 import event
-import time
 
 class DestructionTrailblazer(Ally):
     '''DestructionTrailblazer'''
@@ -91,13 +91,13 @@ class DestructionTrailblazer(Ally):
 
 def __main():
     '''Driver Code'''
-    sp = skillpoint.SkillPoint()
-    observer = event.EventManager()
-    mc = DestructionTrailblazer(80,observer, taunt = 125.0)
-    enemy = e.Enemy("enemy",80,(2000,500,500,80),observer)
-    observer.attach(enemy)
-    print(enemy.curr_hp)
-    mc.basic(enemy,sp)
+    # sp = skillpoint.SkillPoint()
+    # observer = event.EventManager()
+    # mc = DestructionTrailblazer(80,observer, taunt = 125.0)
+    # enemy = e.Enemy("enemy",80,(2000,500,500,80),observer)
+    # observer.attach(enemy)
+    # print(enemy.curr_hp)
+    # mc.basic(enemy,sp)
 
 if __name__ == "__main__":
     __main()
