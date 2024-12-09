@@ -1,61 +1,103 @@
 '''ally'''
-from character import Character
-import enemy as e
 import random
+import time
+from ally_enemy_base import Ally
+import enemy as e
+import damage
 import skillpoint
-import setting
-
-class Ally(Character):
-    '''Ally Class'''
-    def __init__(self, name: str, base_stats: tuple, **kwargs) -> None:
-        '''Constructor
-            hidden_stats =  (
-                            break_efficiency: float,
-                            taunt: float
-                            )
-        '''
-        super().__init__(name, base_stats, **kwargs)
-        self.break_efficiency = kwargs.get('break_efficiency', 0.0)
-        self.taunt = kwargs.get('taunt', 0.0)
-
-    def __str__(self) -> str:
-        '''String'''
-        return super().__str__()
+import event
 
 class DestructionTrailblazer(Ally):
     '''DestructionTrailblazer'''
-    def __init__(self,**kwargs) -> None:
+    def __init__(self, level:int, observer : event.EventManager, **kwargs) -> None:
         name = "Trailblazer"
         base_stats = (1203,620,460,100)
-        super().__init__(name, base_stats, **kwargs)
-
-    def __str__(self) -> str:
-        '''String'''
-        return super().__str__()
+        super().__init__(name, level,'physical', base_stats, observer, max_energy =  120, **kwargs)
 
     def basic(self, target: e.Enemy) -> None:
         '''basic attack'''
-        setting.SP.use(1)
-        base_dmg = self.atk
-        dmg_boost_mult = 1 + self.physical_dmg
-        def_mult = 1 - (target.defe/(target.defe+200+10*80))
-        res_mult = 1 - (target.physical_res)
-        dmg_taken_mult = 1
-        universal_mult = 1*(0.9)
-        crit_mult = 1
-        if random.random() <= self.crit_rate:
-            crit_mult += self.crit_dmg
-        dmg = base_dmg*def_mult*dmg_boost_mult*res_mult*dmg_taken_mult*universal_mult*crit_mult
-        target.hp -= dmg
+        damage.Damage('physical', 1, [1], self, target, self.observer, basic = True).dmg_formula_ally()
+        self.gain_energy(20)
 
-    def skill(self, target: e.Enemy) -> None:
+    def skill(self, left_target: e.Enemy, mid_target : e.Enemy, right_target : e.Enemy) -> None:
         '''skill'''
+        if left_target:
+            damage.Damage('physical', 1.25, [1], self, left_target, self.observer, skill = True).dmg_formula_ally()
+        damage.Damage('physical', 1.25, [1], self, mid_target, self.observer, skill = True).dmg_formula_ally()
+        if right_target:
+            damage.Damage('physical', 1.25, [1], self, right_target, self.observer, skill = True).dmg_formula_ally()
+        self.gain_energy(30)
 
 
-    def ultimate(self, target: e.Enemy) -> None:
+    def ultimate(self, left_target: e.Enemy, mid_target : e.Enemy, right_target : e.Enemy) -> None:
         '''ultimate'''
+        choose = input("Choose mode (1 = single, 2 = double) -> ")
+        if choose == "1":
+            damage.Damage('physical', 4.5, [1], self, mid_target, self.observer, ult = True).dmg_formula_ally()
+        else:
+            damage.Damage('physical', 1.62, [1], self, left_target, self.observer, ult = True).dmg_formula_ally()
+            damage.Damage('physical', 2.7, [1], self, mid_target, self.observer, ult = True).dmg_formula_ally()
+            damage.Damage('physical', 1.62, [1], self, right_target, self.observer, ult = True).dmg_formula_ally()
+        self.gain_energy(5)
 
+    def input_action(self, command : str, enemies : list, sp : skillpoint.SkillPoint):
+        if command == 'basic':
+            sp.use(1)
+            target_index = int(input("Please input which enemy -> "))
+            print(f"{enemies[target_index]} selected")
+            time.sleep(0.3)
+            self.basic(enemies[target_index])
+        elif command == 'skill':
+            if not sp.curr:
+                print("Not enough skill point")
+                return False
+            sp.use(-1)
+            target_index = int(input("Please input which enemy -> "))
+            print(f"{enemies[target_index]} selected")
+            time.sleep(0.3)
+            left_target = None
+            if target_index:
+                left_target = enemies[target_index - 1]
+
+            right_target = None
+            if target_index < len(enemies)-1:
+                right_target = enemies[target_index + 1]
+
+            mid_target = enemies[target_index]
+            self.skill(left_target, mid_target, right_target)
+        elif command == 'ult':
+            if self.curr_energy < self.stats['max_energy']:
+                print('Not enough energy to use ultimate')
+                return False
+            self.use_energy(self.stats["max_energy"])
+            target_index = int(input("Please input which enemy -> "))
+            print(f"{enemies[target_index]} selected")
+            time.sleep(0.3)
+            left_target = None
+            if target_index:
+                left_target = enemies[target_index - 1]
+
+            right_target = None
+            if target_index < len(enemies)-1:
+                right_target = enemies[target_index + 1]
+
+            mid_target = enemies[target_index]
+
+            self.ultimate(left_target, mid_target, right_target)
+        else:
+            print("Invalid Command")
+            return False
+        return True
+
+def __main():
+    '''Driver Code'''
+    # sp = skillpoint.SkillPoint()
+    # observer = event.EventManager()
+    # mc = DestructionTrailblazer(80,observer, taunt = 125.0)
+    # enemy = e.Enemy("enemy",80,(2000,500,500,80),observer)
+    # observer.attach(enemy)
+    # print(enemy.curr_hp)
+    # mc.basic(enemy,sp)
 
 if __name__ == "__main__":
-    mc = DestructionTrailblazer(taunt = 125.0)
-    print(mc)
+    __main()
