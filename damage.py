@@ -1,24 +1,36 @@
-'''damage'''
+"""damage"""
+
 import random
 import custom_exception as ex
-from ally_enemy_base import Ally,Enemy
+from ally_enemy_base import Ally, Enemy
 import event
 
 ELEMENTS = ["fire", "ice", "physical", "lightning", "wind", "quantum", "imaginary"]
-class Damage:
-    '''Damage class'''
 
-    def __init__(self, element : str, mult : float, hits : list, char : Ally, target : Enemy, observer : event.EventManager, **kwargs):
-        #ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
-        '''Constructor'''
+
+class Damage:
+    """Damage class"""
+
+    def __init__(
+        self,
+        element: str,
+        mult: float,
+        hits: list,
+        char: Ally,
+        target: Enemy,
+        observer: event.EventManager,
+        **kwargs,
+    ):
+        # ratio between hit ex. (1,1,3) = first hit deals 1/5, second deals 1/5, third deals 3/5
+        """Constructor"""
         self.type = {
-            "basic" : kwargs.get('basic', False),
-            "skill" : kwargs.get('skill',False),
-            "ult" : kwargs.get('ult',False),
-            "fua" : kwargs.get('fua',False),
-            "dot" : kwargs.get('dot',False),
-            "break" : kwargs.get('break',False),
-            "additional" : kwargs.get('additional',False)
+            "basic": kwargs.get("basic", False),
+            "skill": kwargs.get("skill", False),
+            "ult": kwargs.get("ult", False),
+            "fua": kwargs.get("fua", False),
+            "dot": kwargs.get("dot", False),
+            "break": kwargs.get("break", False),
+            "additional": kwargs.get("additional", False),
         }
 
         self.char = char
@@ -32,7 +44,9 @@ class Damage:
         self.hits = hits
         self.base_dmg = round(self.mult * char.total_atk, 2)
         self.dmg_mult = 1 + char.dmg_boost[self.element]
-        self.def_mult = 1 - (target.total_def/(target.total_def + 200 + 10 * char.level))
+        self.def_mult = 1 - (
+            target.total_def / (target.total_def + 200 + 10 * char.level)
+        )
         self.res_mult = 1 - (target.res[self.element] - char.stats["res_pen"])
         self.vulnerability = 1 + target.vulnerable
         self.universal = 1 * (0.9)
@@ -40,20 +54,28 @@ class Damage:
             self.universal = 1
 
     def __str__(self):
-        '''str'''
+        """str"""
         return (
             f"Element : {self.element}\n"
             f"Multiplyer : {self.mult}%\n"
             f"Type : {[dtype[0] for dtype in self.type.items() if dtype[1]]}"
         )
+
     def dmg_formula_ally(self):
-        '''Calculate total damage and split the hit'''
+        """Calculate total damage and split the hit"""
 
         # calculate total damage
-        total_dmg = self.base_dmg*self.dmg_mult*self.def_mult*self.res_mult*self.vulnerability*self.universal
+        total_dmg = (
+            self.base_dmg
+            * self.dmg_mult
+            * self.def_mult
+            * self.res_mult
+            * self.vulnerability
+            * self.universal
+        )
 
         # split the hits in ratio
-        dmg_per_hit = [ratio/sum(self.hits)*total_dmg for ratio in self.hits]
+        dmg_per_hit = [ratio / sum(self.hits) * total_dmg for ratio in self.hits]
 
         # iterate through each hit in dmg_per hit and calculate if a hit is a critical or not
         for dmg in dmg_per_hit:
@@ -67,8 +89,9 @@ class Damage:
         # return all hits seperately in a list
         return dmg_per_hit
 
+
 def __test():
-    '''Driver Code'''
+    """Driver Code"""
     # tingyun = Ally("Tingyun", 50, "lightning", (1086+545, 579+483, 480+113, 112+25),
     #                  crit_rate = 0.088,
     #                  crit_dmg = 0.671,
@@ -89,6 +112,7 @@ def __test():
     # print(dmg.res_mult)
     # print(hits)
     # print(sum(hits))
+
 
 if __name__ == "__main__":
     __test()

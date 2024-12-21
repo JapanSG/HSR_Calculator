@@ -80,7 +80,22 @@ class TurnManager:
                 self.running = False
                 finished = True
             elif command == "help":
-                print("List of Commands: `basic`, `skill`, `ult`")
+                print(
+                    """
+                    List of Commands:
+    >> For combat:
+        `basic` = Basic attack,
+        `skill` = Use skill points to attack,
+        `ult`   = Use energies to perform an ultimate attack 
+    >> General:
+        `q`     = To quit the program,
+        `order` = Show all turn orders,
+        `hp`    = Show an enemy's hit point,
+        `va`    = View the current ally,
+        `ve`    = View the current enemy,
+        `sp`    = View remaining skill points
+                      """
+                )
             elif command == "order":
                 self.print_order(ally.name)
             elif command == "hp":
@@ -91,6 +106,8 @@ class TurnManager:
             elif command == "ve":
                 print(*self.enemies)
             elif command == "sp":
+                print(self.sp)
+            elif command == "":
                 print(self.sp)
             else:
                 finished = ally.input_action(command, self.enemies, self.sp)
