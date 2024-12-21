@@ -64,7 +64,6 @@ class TurnManager:
 
     def do_action(self, item) -> None:
         """Do action when av == 0 and reset av"""
-        # TODO
         if isinstance(item[0], ally_enemy_base.Ally):
             self.input_action(item[0])
         else:
@@ -81,8 +80,7 @@ class TurnManager:
                 self.running = False
                 finished = True
             elif command == "help":
-                # TODO Add list of commands
-                print("List of Commands:")
+                print("List of Commands: `basic`, `skill`, `ult`")
             elif command == "order":
                 self.print_order(ally.name)
             elif command == "hp":
