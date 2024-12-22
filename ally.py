@@ -106,7 +106,6 @@ class DestructionTrailblazer(Ally):
             self.use_energy(self.stats["max_energy"])
             target_index = int(input("Please input which enemy -> "))
             print(f"{enemies[target_index]} selected and caused damage")
-            # TODO Display damage numbers
             time.sleep(0.3)
             left_target = None
             if target_index:
