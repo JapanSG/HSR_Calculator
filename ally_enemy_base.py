@@ -84,16 +84,22 @@ class Ally(Character):
 
     def update(self,lis : list):
         '''update event'''
+        #got hit
         if lis[0] == event.DamageEvent and lis[2] is self:
             self.curr_hp -= lis[3]
             self.gain_energy(5)
+
+        #activate 2pc relics
         elif lis[0] == event.Relic2pcPassive and lis[1] is self:
             lis[2].passive_2pc(self)
+
+        #activate 4pc relics
         elif lis[0] == event.Relic4pcPassive and lis[1] is self:
             lis[2].passive_4pc(self, self.observer)
 
 class Enemy(Character):
     '''Enemy Class'''
+
     def __init__(self, name: str, level:int, base_stats : tuple, observer : event.EventManager, **kwargs) -> None:
         '''Constructor'''
         super().__init__(name, level, base_stats, observer, **kwargs)
@@ -101,10 +107,6 @@ class Enemy(Character):
 
         self.toughness = kwargs.get('toughness', 30)
         self.curr_toughness = self.toughness
-
-    def __str__(self):
-        '''String'''
-        return super().__str__()
     
     def update(self, lis):
         '''update event'''
