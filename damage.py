@@ -30,14 +30,19 @@ class Damage:
         self.element = element
         self.mult = mult
         self.hits = hits
+
+        #TODO : Change all of this to function
         self.base_dmg = round(self.mult * char.total_atk, 2)
         self.dmg_mult = 1 + char.dmg_boost[self.element]
         self.def_mult = 1 - (target.total_def/(target.total_def + 200 + 10 * char.level))
         self.res_mult = 1 - (target.res[self.element] - char.stats["res_pen"])
         self.vulnerability = 1 + target.vulnerable
         self.universal = 1 * (0.9)
-        if target.curr_toughness <= 0:
-            self.universal = 1
+        try :
+            if target.curr_toughness <= 0:
+                self.universal = 1
+        except AttributeError:
+            pass
 
     def __str__(self):
         '''str'''
