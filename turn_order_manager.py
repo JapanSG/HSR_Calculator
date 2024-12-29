@@ -1,9 +1,10 @@
 '''turn_order_manager'''
+import math as m
+import random
 import skillpoint as sk
 import ally_enemy_base
 import ally as a
 import enemy as e
-import math as m
 # TODO
 # list of things to fix
 # everyting is broken since structuring inheritance in the Character class and it's subclasses
@@ -24,7 +25,7 @@ class TurnManager:
         self.running = True
         self.allies = [char for char in characters if isinstance(char, a.Ally)]
         self.enemies = [char for char in characters if isinstance(char, e.Enemy)]
-        self.order = [[char, 10000, m.ceil(10000/char.total_spd)] for char in characters] # item = [Character, AG left, current AV]
+        self.order = [[char, 10000, m.ceil(10000/char.total_spd())] for char in characters] # item = [Character, AG left, current AV]
         self.order.sort(key = lambda item : item[2])
 
     def update(self) -> None:
@@ -33,12 +34,14 @@ class TurnManager:
         if not av_passed:
             item = self.order.pop(0)
             self.do_action(item)
-            new = [item[0], 10000, m.ceil(10000/item[0].total_spd)]
+            new = [item[0], 10000, m.ceil(10000/item[0].total_spd())]
             self.__insert(new)
             return
-        for i in range(len(self.order)):
+
+        length = len(self.order)
+        for i in range(length):
             item = self.order[i]
-            total_spd = item[0].total_spd
+            total_spd = item[0].total_spd()
             ag = max(item[1] - total_spd*av_passed, 0)
             av = max(item[2] - av_passed, 0)
             self.order[i] = [item[0], ag, av]
@@ -56,14 +59,26 @@ class TurnManager:
 
     def do_action(self, item) -> None:
         '''Do action when av == 0 and reset av'''
-        #TODO
+        #Ally take turn
         if isinstance(item[0], ally_enemy_base.Ally):
             self.input_action(item[0])
+
+        #Enemy take turn
         else:
+            enemy = item[0]
+            taunt_value = [ally.stats["taunt"] for ally in self.allies]
+            rand = random.randint(1, sum(taunt_value))
+            num = len(self.allies)
+            target = None
+            for i in range(num):
+                if rand <= sum(taunt_value[0:i+1]):
+                    target : ally_enemy_base.Ally = self.allies[i]
+            enemy.input_action(target)
             print("Enemy took turn")
-        return print("Pass")
-    
+        return print(f"{item[0]} Ends turn")
+
     def input_action(self, ally : ally_enemy_base.Ally):
+        '''Input command to do stuff'''
         finished = False
         print(f"It's {ally.name} turn")
         while not finished:
@@ -90,24 +105,26 @@ class TurnManager:
 
     def __insert(self, item: list) -> None:
         '''insert item at correct av'''
-        for i in range(len(self.order)):
+        length =len(self.order)
+        for i in range(length):
             if self.order[i][2] > item[2]:
                 self.order.insert(i, item)
                 return
         self.order.append(item)
 
-    # FIXME
     def remove_dead(self) -> None:
         '''remove character that have less than  0 hp'''
         dead_allies = []
-        for i in range(len(self.allies)):
+        length = len(self.allies)
+        for i in range(length):
             if self.allies[i].curr_hp <= 0:
                 dead_allies.append(i)
         for i in dead_allies:
             self.allies.pop(i)
 
         dead_enemies = []
-        for i in range(len(self.enemies)):
+        length = len(self.enemies)
+        for i in range(length):
             if self.enemies[i].curr_hp <= 0:
                 dead_enemies.append(i)
         for i in dead_enemies:
@@ -130,6 +147,7 @@ class TurnManager:
 
 def main():
     '''Driver Code'''
-
+    lis = [0,1,2,3,4]
+    print(lis[0:0])
 if __name__ == "__main__":
     main()
