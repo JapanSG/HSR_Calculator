@@ -87,14 +87,7 @@ class Character:
         self.name = name
         self.level = level
 
-        self.total_hp = self.stats["hp"] * (1 + self.stats["hp_per"]) + self.stats["hp_flat"]
-        self.curr_hp = self.total_hp
-
-        self.total_atk = self.stats["atk"] * (1 + self.stats["atk_per"]) + self.stats["atk_flat"]
-
-        self.total_def = self.stats["defe"] * (1 + self.stats["def_per"] - self.stats["def_ignore"]) + self.stats["def_flat"]
-
-        self.total_spd = self.stats["spd"] * (1 + self.stats["spd_per"]) + self.stats["spd_flat"]
+        self.curr_hp = self.total_hp()
 
         self.dot_dmg_boost = kwargs.get('dot_dmg_boost', 0.0)
         self.dot_dmg_taken = kwargs.get('dot_dmg_taken', 0.0)
@@ -130,3 +123,23 @@ class Character:
     def __repr__(self) -> str:
         '''repr'''
         return self.__str__()
+
+    def total_hp(self)-> float:
+        '''Return total HP'''
+        return self.stats["hp"] * (1 + self.stats["hp_per"]) + self.stats["hp_flat"]
+
+    def total_atk(self)-> float:
+        '''Return the total ATK'''
+        return self.stats["atk"] * (1 + self.stats["atk_per"]) + self.stats["atk_flat"]
+
+    def total_def(self)-> float:
+        '''Return the total DEF'''
+        base = self.stats["defe"]
+        percent = self.stats["def_per"]
+        ignore = self.stats["def_ignore"]
+        flat = self.stats["def_flat"]
+        return base * (1 + percent - ignore) + flat
+
+    def total_spd(self) -> float:
+        '''Return total SPD'''
+        return self.stats["spd"] * (1 + self.stats["spd_per"]) + self.stats["spd_flat"]
