@@ -16,31 +16,132 @@ class DestructionTrailblazer(Ally):
 
     def basic(self, target: e.Enemy) -> None:
         '''basic attack'''
-        damage.Damage('physical', 1, [1], self, target, self.observer, basic = True).dmg_formula_ally()
+        dmg = damage.Damage(
+            element = 'physical',
+            mult = 1,
+            hits = [1],
+            char = self,
+            target = target,
+            observer = self.observer,
+            basic = True
+        )
+        dmg.dmg_formula_ally()
         self.gain_energy(20)
 
     def skill(self, left_target: e.Enemy, mid_target : e.Enemy, right_target : e.Enemy) -> None:
         '''skill'''
+        #dmg for left target
         if left_target:
-            damage.Damage('physical', 1.25, [1], self, left_target, self.observer, skill = True).dmg_formula_ally()
-        damage.Damage('physical', 1.25, [1], self, mid_target, self.observer, skill = True).dmg_formula_ally()
+            dmg1 = damage.Damage(
+                element = 'physical',
+                mult = 1.25,
+                hits = [1],
+                char = self,
+                target = left_target,
+                observer = self.observer,
+                skill = True
+            )
+            dmg1.dmg_formula_ally()
+
+        #dmg for mid target
+        dmg2 = damage.Damage(
+            element = 'physical',
+            mult = 1.25,
+            hits = [1],
+            char = self,
+            target = mid_target,
+            observer = self.observer,
+            skill = True)
+        dmg2.dmg_formula_ally()
+
+        #dmg for right target
         if right_target:
-            damage.Damage('physical', 1.25, [1], self, right_target, self.observer, skill = True).dmg_formula_ally()
+            dmg3 = damage.Damage(
+            element = 'physical',
+            mult = 1.25,
+            hits = [1],
+            char = self,
+            target = right_target,
+            observer = self.observer,
+            skill = True
+        )
+            dmg3.dmg_formula_ally()
+
+        #gain energy
         self.gain_energy(30)
 
 
     def ultimate(self, left_target: e.Enemy, mid_target : e.Enemy, right_target : e.Enemy) -> None:
         '''ultimate'''
         choose = input("Choose mode (1 = single, 2 = double) -> ")
+        #If choose 1st mode
         if choose == "1":
-            damage.Damage('physical', 4.5, [1], self, mid_target, self.observer, ult = True).dmg_formula_ally()
+
+            #Damage instance
+            dmg = damage.Damage(
+                element = 'physical',
+                mult = 4.5,
+                hits = [1],
+                char = self,
+                target = mid_target,
+                observer = self.observer,
+                ult = True
+            )
+
+            #Calculate dmg
+            dmg.dmg_formula_ally()
+
+
+        #If choose 2nd mode
         else:
-            damage.Damage('physical', 1.62, [1], self, left_target, self.observer, ult = True).dmg_formula_ally()
-            damage.Damage('physical', 2.7, [1], self, mid_target, self.observer, ult = True).dmg_formula_ally()
-            damage.Damage('physical', 1.62, [1], self, right_target, self.observer, ult = True).dmg_formula_ally()
+
+            #1st damage instance
+            dmg1 = damage.Damage(
+                element = 'physical',
+                mult = 1.62,
+                hits = [1],
+                char = self,
+                target = left_target,
+                observer = self.observer,
+                ult = True
+            )
+
+            #Calculate 1st damage instance
+            dmg1.dmg_formula_ally()
+
+            #2nd damage instance
+            dmg2 = damage.Damage(
+                element = 'physical',
+                mult = 2.7,
+                hits = [1],
+                char = self,
+                target = mid_target,
+                observer = self.observer,
+                ult = True
+            )
+
+            #Calculate 1nd damage instance
+            dmg2.dmg_formula_ally()
+
+            #3rd damage instance
+            dmg3 = damage.Damage(
+                element = 'physical',
+                mult = 1.62,
+                hits = [1],
+                char = self,
+                target = right_target,
+                observer = self.observer,
+                ult = True
+            )
+
+            #Calculate 3rd damage instance
+            dmg3.dmg_formula_ally()
+
+        #gain energy
         self.gain_energy(5)
 
     def input_action(self, command : str, enemies : list, sp : skillpoint.SkillPoint):
+        '''input function'''
         if command == 'basic':
             sp.use(1)
             target_index = int(input("Please input which enemy -> "))
