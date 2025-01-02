@@ -107,7 +107,45 @@ class Enemy(Character):
 
         self.toughness = kwargs.get('toughness', 30)
         self.curr_toughness = self.toughness
-    
+
+    def get_base_def(self):
+        '''return base def base on level'''
+        base_def = 200 + 10 * self.level
+        return base_def
+
+    def get_base_spd(self, spd):
+        '''return base spd base on level'''
+        level = self.level
+        if level < 65:
+            spd *= 1
+        elif level < 78:
+            spd *= 1.1
+        elif level < 86:
+            spd *= 1.2
+        else:
+            spd *= 1.32
+        return spd
+    #FIXME : hp scaling currently is linear using linear interpolation fix this by changing it to quardratic scaling
+    def get_atk_or_hp(self, lis):
+        '''get base atk and hp'''
+        lvb = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95]
+        lvb = list(zip(lvb, lis))
+        if 0 > self.level > 95:
+            raise ValueError(f"Invalid level '{self.level}'")
+        q, r = divmod(self.level, 10)
+        length = len(lvb)
+        for i in range(length):
+            if lvb[i][0]//10 == q:
+                stats_per_level = (lvb[i+1][1] - lvb[i][1]) / (lvb[i+1][0] - lvb[i][0])
+                return stats_per_level*r + lvb[i][1]
+        return -1
+
+    def get_effect_res(self, effect_res):
+        '''return effect_res base on level'''
+        additional = 0.004 * min(max(0, self.level-50), 25)
+        effect_res += additional
+        return effect_res
+
     def update(self, lis):
         '''update event'''
         ##get hit
@@ -116,4 +154,8 @@ class Enemy(Character):
 
 
 if __name__ == "__main__":
-    pass
+    a = Enemy("test", 93, (0,0,0,0), None)
+    data = [12,26,53,98,155,234,338,436,552,663,718]
+    atk = a.get_atk_or_hp(data)
+    print(a.level)
+    print(atk)
